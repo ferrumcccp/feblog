@@ -1,3 +1,5 @@
+
+
 class FeNode:
     """
     A node storing a series of BBCode and HTML
@@ -22,6 +24,7 @@ class FeNode:
         self.__next = None
         self.__copied = False
         self.nodetype = nodetype
+
     def copy(self):
         """Copy this node
 
@@ -34,6 +37,9 @@ class FeNode:
         x.__next = self.__next
         x.__copied = 1
         self.__copied = 1
+
     def push_copy(self):
         """Copy the subnode and push the copy mark down"""
         self.__prev = self.__prev.copy()
+
+
