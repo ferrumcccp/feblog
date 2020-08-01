@@ -1,4 +1,5 @@
-
+"""
+"""
 
 class FeNode:
     """
@@ -14,8 +15,8 @@ class FeNode:
 
         Instance Fields:
         nodetype: Node type
-            0 = BBCode
-            1 = Target HTML
+            0 = Source node
+            1 = Target node
         __prev: Subtree for data previous to this node (Not currently used)
         __next: Subtree for data next to this node
         __copied: Whether the node is copied and copying subtree is needed
@@ -41,5 +42,11 @@ class FeNode:
     def push_copy(self):
         """Copy the subnode and push the copy mark down"""
         self.__prev = self.__prev.copy()
+        self.__next = self.__next.copy()
+        self.__copied = 0
+
+    def get_prev(self):
+        self.push_copy()
+        return self.__prev
 
 
