@@ -1,11 +1,13 @@
-"""
+""" Node tree
+
+Tree structure to free the blog system from the dull string processing
 """
 
 class FeNode:
-    """
-    A node storing a series of BBCode and HTML
+    """A node storing a series of BBCode and HTML
 
-    This class stores a data structure node which can be several document nodes.
+    Each instance stores a data structure node which can be several document
+        nodes.
     For example:
         <p>sth</p>sth outside
     hmm
@@ -24,6 +26,7 @@ class FeNode:
         self.__prev = None
         self.__next = None
         self.__copied = False
+        self.size = 1
         self.nodetype = nodetype
 
     def copy(self):
@@ -40,13 +43,54 @@ class FeNode:
         self.__copied = 1
 
     def push_copy(self):
-        """Copy the subnode and push the copy mark down"""
+        """Copy the subnode and push down the copy mark"""
         self.__prev = self.__prev.copy()
         self.__next = self.__next.copy()
         self.__copied = 0
 
+    def pull(self):
+        """Update subtree-related information
+
+        Update self.size
+        """
+        self.size = self.__prev.size + self.__next.size + 1
+
     def get_prev(self):
         self.push_copy()
         return self.__prev
+    def get_next(self):
+        self.push_copy()
+        return self.__next
+    def set_prev(self, x):
+        self.push_copy()
+        self.prev = x
+        self.pull()
+    def set_next(self, x):
+        self.push_copy()
+        self.next = x
+        self.pull()
+
+    def __iter__(self):
+        """Left-Current Node-Right Traverse
+
+        Do not do any of the following things during iteration:
+            - Call set_prev or set_next
+        """
+        for i in self.get_prev():
+            yield i
+        yield self
+        for i in self.get_next():
+            yield i
+
+    def get_str_self(self):
+        """Get the string repr. of the node itself regardless of prev and next
+        """
+        return ""
 
 
+class FeTextNode(FeNode):
+    """Text node
+    """
+    def __init__(self, text="", nodetype = 0):
+        # TODO: finish this
+        super().__init__()
