@@ -2,6 +2,7 @@
 
 Tree structure to free the blog system from the dull string processing
 """
+import strescape
 
 class FeNode:
     """A node storing a series of BBCode and HTML
@@ -43,7 +44,7 @@ class FeNode:
         self.__copied = 1
 
     def push_copy(self):
-        """Copy the subnode and push down the copy mark"""
+        """Copy the subnode and push down the copy tag"""
         self.__prev = self.__prev.copy()
         self.__next = self.__next.copy()
         self.__copied = 0
@@ -71,7 +72,7 @@ class FeNode:
         self.pull()
 
     def __iter__(self):
-        """Left-Current Node-Right Traverse
+        """Left-CurrentNode-Right Traverse
 
         Do not do any of the following things during iteration:
             - Call set_prev or set_next
@@ -98,7 +99,21 @@ class FeTextNode(FeNode):
         """Constructor
 
         Instance Fields:
+            See super class
             text: Text
         """
         super().__init__()
         self.text = text
+
+    def str_self(self):
+        """Get the string repr. of the node itself regardless of prev and next
+        """
+        return amp_escape(self.text)
+
+    def copy(self):
+        """Copy this node
+
+        See super class
+        """
+        cp = super().copy()
+        cp.text = self.text
