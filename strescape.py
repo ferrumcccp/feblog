@@ -1,8 +1,10 @@
 """Functions to escape strings
 """
+
+
 def amp_escape(s):
     """& escape
-    
+
     Example:
     >>> amp_escape("<XRJ is HUGE>\\\"&")
     '&lt;XRJ&nbsp;is&nbsp;HUGE&rt;&quot;&amp;'
