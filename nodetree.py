@@ -63,11 +63,11 @@ class FeNode:
         return self.__next
     def set_prev(self, x):
         self.push_copy()
-        self.prev = x
+        self.__prev = x
         self.pull()
     def set_next(self, x):
         self.push_copy()
-        self.next = x
+        self.__next = x
         self.pull()
 
     def __iter__(self):
@@ -82,10 +82,13 @@ class FeNode:
         for i in self.get_next():
             yield i
 
-    def get_str_self(self):
+    def str_self(self):
         """Get the string repr. of the node itself regardless of prev and next
         """
         return ""
+
+    def __str__(self):
+        return str(self.get_prev()) + self.str_self() + str(self.get_next())
 
 
 class FeTextNode(FeNode):
