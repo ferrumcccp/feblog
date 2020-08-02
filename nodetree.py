@@ -92,5 +92,10 @@ class FeTextNode(FeNode):
     """Text node
     """
     def __init__(self, text="", nodetype = 0):
-        # TODO: finish this
+        """Constructor
+
+        Instance Fields:
+            text: Text
+        """
         super().__init__()
+        self.text = text
