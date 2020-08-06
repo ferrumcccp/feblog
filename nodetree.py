@@ -50,7 +50,7 @@ class FeNode:
     def isolate(self):
         """Create a copy with _prev and _next removed
 
-        Not removing other fields. Not even "inside" 
+        Not removing other fields. Not even "inside"
         """
         x = self.copy()
         x._prev = None
@@ -113,7 +113,7 @@ class FeNode:
 
     def __str__(self):
         """Stringify self"""
-        return (str(self.get_prev() or "") + self.str_self() 
+        return (str(self.get_prev() or "") + self.str_self()
                 + str(self.get_next() or ""))
 
     def push_back(self, x):
@@ -162,14 +162,15 @@ class FeTextNode(FeNode):
 class FeTagNode(FeNode):
     """Tag node. That is <xxx zzz="www">yyy</xxx>
     """
-    def __init__(self, nodetype = 0, prop = None, tagname = ""):
+    def __init__(self, nodetype = 0, prop = None, tagname = "", inside = ""):
         """Constructor
 
         Instance Fields:
             See super class
             prop: dictionary of properties
             tagname: tag name (xxx in the example above)
-            __inside: the node embedded inside the tag (yyy)
+            _inside(in argument "inside"):
+                the node embedded inside the tag (yyy)
         """
         super().__init__(nodetype = nodetype)
         self.tagname = tagname
@@ -184,6 +185,7 @@ class FeTagNode(FeNode):
         """
         cp = super().copy()
         cp._inside = self._inside
+        cp.tagname = self.tagname
         cp.prop = {}
         for i in self.prop:
             cp.prop[i] = self.prop[i]
@@ -195,13 +197,12 @@ class FeTagNode(FeNode):
             self._inside = self._inside.copy()
         super().push_copy()
 
-    def get_inside(self):
+    def __get_inside(self):
+        """set the node inside the tag
+
+        See set_inside for usage notes."""
         self.push_copy()
         return self._inside
-    def set_inside(self):
-        y = self.copy()
-        y._inside = x
-        return y
 
     def str_self(self):
         open_tag = self.tagname
@@ -212,4 +213,24 @@ class FeTagNode(FeNode):
             else:
                 open_tag += " %s" % i
         return "<%s>%s</%s>" % (open_tag,
-                str(self.get_inside() or ""), self.tagname)
+                str(self.__get_inside() or ""), self.tagname)
+
+
+import unittest
+class FeNodeTest(unittest.TestCase):
+    def test_test1(self):
+        """Basic Test"""
+        x = FeTagNode(tagname = "x", prop = {"y": "1", "z": None})
+        z = x.copy()
+        self.assertEqual(str(x), '<x y="1" z></x>')
+        self.assertEqual(str(z), '<x y="1" z></x>')
+        u = x.push_back(FeTextNode(text = "hahaha"))
+        self.assertEqual(str(u), '<x y="1" z></x>hahaha')
+        v=x.push_front(FeTextNode(text = "ohmygod"))
+        self.assertEqual(str(v), 'ohmygod<x y="1" z></x>')
+        w=u.push_front(FeTextNode(text = "ohmygod"))
+        self.assertEqual(str(w), 'ohmygod<x y="1" z></x>hahaha')
+
+
+if __name__ == '__main__':
+    unittest.main()
