@@ -117,7 +117,7 @@ class FeNode:
             yield i
 
     def str_self(self):
-        """Get the string repr. of the node itself regardless of prev and next
+        """Get the str of the node itself, ignoring prev and next
         """
         return ""
 
@@ -125,6 +125,16 @@ class FeNode:
         """Stringify self"""
         return (str(self.get_prev() or "") + self.str_self()
                 + str(self.get_next() or ""))
+
+    def repr_self(self):
+        """Get the repr of the node itself, ignoring prev and next
+        """
+        return "<FeNode>"
+
+    def __repr__(self):
+        """Represent self"""
+        return "(%s) + %s + (%s)" % (repr(self.get_prev()), self.repr_self()
+                , repr(self.get_next()))
 
     def push_back(self, x):
         """Add x to the end of self, returning new node"""
@@ -216,11 +226,14 @@ class FeTextNode(FeNode):
         cp.text = self.text
         return cp
 
+    def repr_self(self):
+        return repr(self.text)
+
 
 class FeTagNode(FeNode):
     """Tag node. That is <xxx zzz="www">yyy</xxx>
     """
-    def __init__(self, tagname = "",prop = None, inside = None, nodetype = 0):
+    def __init__(self, tagname = "", prop = None, inside = None, nodetype = 0):
         """Constructor
 
         Instance Fields:
@@ -276,6 +289,10 @@ class FeTagNode(FeNode):
         fmt = "<%s>%s</%s>" if self.nodetype else "[%s]%s[/%s]"
         return fmt % (open_tag,
                 str(self.__get_inside() or ""), self.tagname)
+
+    def repr_self(self):
+        return ("FeTagNode(tagname = %s, prop = %s, inside = %s, nodetype = %d)"
+                % (self.tagname, self.prop, self._inside, self.nodetype))
 
 
 import unittest
