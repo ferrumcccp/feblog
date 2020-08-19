@@ -261,9 +261,7 @@ class FeTagNode(FeNode):
         super().push_copy()
 
     def __get_inside(self):
-        """set the node inside the tag
-
-        See set_inside for usage notes."""
+        """get the node inside the tag"""
         self.push_copy()
         return self._inside
 
