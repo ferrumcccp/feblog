@@ -47,6 +47,7 @@ class FeNode:
         x = self.__class__(nodetype = self.nodetype)
         x._prev = self._prev
         x._next = self._next
+        x._rand = self._rand
         x._copied = True
         self._copied = True
         return x
@@ -243,6 +244,9 @@ class FeTagNode(FeNode):
                     (e.g <sometag href="#top">)
                 "key":None means a key-only property
                     (e.g <sometag contenteditable>)
+                If key is "self", it means that the tagname itself 
+                    has theproperty value with it 
+                    e.g. [url="about:blank"]
 
             tagname: tag name (xxx in the example above)
             _inside("inside" as in arg):
@@ -273,26 +277,36 @@ class FeTagNode(FeNode):
             self._inside = self._inside.copy()
         super().push_copy()
 
-    def __get_inside(self):
-        """get the node inside the tag"""
+    def get_inside(self):
+        """get the node inside the tag
+
+        Only to be used when the node represents only one
+        toplevel tag. (e.g the item created by iteration)
+        Otherwise you'll never know how it is actually 
+        stored."""
         self.push_copy()
         return self._inside
 
     def str_self(self):
         open_tag = self.tagname
+        if "self" in self.prop:
+            open_tag += "=%s" % self.prop["self"]
         for i in self.prop:
             if self.prop[i]:
-                open_tag += " %s=\"%s\"" % (i,
+                if i == "self":
+                    pass
+                else:
+                    open_tag += " %s=\"%s\"" % (i,
                         strescape.amp_escape(self.prop[i]))
             else:
                 open_tag += " %s" % i
         fmt = "<%s>%s</%s>" if self.nodetype else "[%s]%s[/%s]"
         return fmt % (open_tag,
-                str(self.__get_inside() or ""), self.tagname)
+                str(self.get_inside() or ""), self.tagname)
 
     def repr_self(self):
-        return ("FeTagNode(tagname = %s, prop = %s, inside = %s, nodetype = %d)"
-                % (self.tagname, self.prop, self._inside, self.nodetype))
+        return ("FeTagNode(tagname = %s, prop = %s, inside = %s, nodetype = %d, size = %d, _rand = %.2e)"
+                % (repr(self.tagname), repr(self.prop), repr(self._inside), self.nodetype, self.size, self._rand))
 
 
 import unittest
@@ -341,7 +355,26 @@ class FeNodeTest(unittest.TestCase):
         # Let's see if size is correct
         self.assertEqual(y.size, 6)
 
+    def test_debug(self):
+        """A test to fix the incorrect maintenance of size, hope this works."""
+        x = FeTagNode("x" , {})
+        print(repr(x))
+        y = x
+        self.assertEqual(x.size, 1)
+        x = x + y
+        print(repr(x))
+        self.assertEqual(x.size, 2)
+        x = x + y
+        print(repr(x))
+        self.assertEqual(x.size, 3)
+        x = x + y
+        print(repr(x))
+        self.assertEqual(x.size, 4)
+        x = x + y
+        print(repr(x))
+        self.assertEqual(x.size, 5)
+
 
 if __name__ == '__main__':
-    random.seed(1) # For debugging
+    #random.seed(5) # For debugging
     unittest.main()
