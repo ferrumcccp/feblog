@@ -11,12 +11,20 @@ import strescape
 class FeNode:
     """A node storing a series of BBCode and HTML
 
-    Each instance stores a data structure node which can be several document
-        nodes.
-    For example:
-        <p>sth</p>sth outside
-        While FeNode may contain the whole thing, the top-level document nodes
-            are "<p>sth</p>" and "sth outside"
+    To make things clear, when we speak about a "node", we mean a data
+    structure object which contains a series of elements, or in other words,
+    a valid segment of the document. An "element", on the other hand, means
+    a document element, either a piece of plain text or a tag with all of its
+    inner content. (The document sometimes refers to elements as "nodes", FIXME)
+    
+    **It's recommended to use operators helper functions in place of constructors and member methods**
+
+    Since nodes are not elements, the differences between FeNode, FeTextNode
+    and FeTagNode is just a matter of implementation detail. The member methods
+    also cover too many details. Besides, the data structure is designed to
+    work like a value type. Member methods are not what it's really about.
+
+    (TODO: work on helper functions)
     """
     def __init__(self, nodetype = 0):
         """Constructor
@@ -48,6 +56,7 @@ class FeNode:
         x._prev = self._prev
         x._next = self._next
         x._rand = self._rand
+        x.size = self.size
         x._copied = True
         self._copied = True
         return x
@@ -331,6 +340,7 @@ class FeNodeTest(unittest.TestCase):
             , 'hahaha'])
         # Let's see if size is correct
         self.assertEqual(w.size, 3)
+        # print("w = %s" % repr(w))
         # Splitting
         w1, w2 = w.split_at(2)
         self.assertEqual(str(w1), 'ohmygod[x y="1" z][/x]')
@@ -358,20 +368,20 @@ class FeNodeTest(unittest.TestCase):
     def test_debug(self):
         """A test to fix the incorrect maintenance of size, hope this works."""
         x = FeTagNode("x" , {})
-        print(repr(x))
+        # print(repr(x))
         y = x
         self.assertEqual(x.size, 1)
         x = x + y
-        print(repr(x))
+        # print(repr(x))
         self.assertEqual(x.size, 2)
         x = x + y
-        print(repr(x))
+        # print(repr(x))
         self.assertEqual(x.size, 3)
         x = x + y
-        print(repr(x))
+        # print(repr(x))
         self.assertEqual(x.size, 4)
         x = x + y
-        print(repr(x))
+        # print(repr(x))
         self.assertEqual(x.size, 5)
 
 
